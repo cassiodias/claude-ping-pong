@@ -10,6 +10,16 @@
       "title": "Commands that play a match",
       "description": "Slash commands or skills, comma separated, without the slash",
       "default": "code-review"
+    },
+    "display": {
+      "type": "string",
+      "title": "Where the match plays",
+      "description": "pane: a narrow pane beside the chat; band: a strip above the prompt that shows only while a match runs",
+      "options": [
+        "pane",
+        "band"
+      ],
+      "default": "band"
     }
   }
 }

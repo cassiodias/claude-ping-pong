@@ -15,7 +15,7 @@ const PANE = {
 } as const
 
 
-test('subagents of a listed command take the seats and the match ends with the last one', { options: { commands: 'review, /qa' } }, async ($, on) => {
+test('subagents of a listed command take the seats and the match ends with the last one', { options: { commands: 'review, /qa', display: 'pane' } }, async ($, on) => {
   let next = 0
   on('skill.prompt', (_, e) => ({ text: e.text }))
   on('agent.spawn', () => ({ model: 'opus', agentId: `a${++next}` }))
@@ -57,4 +57,24 @@ test('a command not in the list plays no match', async ($, on) => {
   const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
   expect(await ui.find({ type: 'Text', text: /waiting for a match/ })).toBeTruthy()
   await ui.unmount()
+})
+
+test('a band match draws above the prompt and leaves the pane alone', { options: { commands: 'review' } }, async ($, on) => {
+  on('skill.prompt', (_, e) => ({ text: e.text }))
+  on('ui.close', () => ({ value: undefined }))
+  mock.clock(on)
+
+  await $.skill.prompt({ skill: 'review', text: '', frontmatter: {}, source: 'user' } as never)
+
+  for (const surface of ['terminal', 'desktop'] as const) {
+    const ui = await $.ui.mount({
+      plugin: 'puppet-ping-pong',
+      surface,
+      component: 'AbovePrompt',
+      props: { hasSurvey: false, isWorking: true, maxRows: 8, bodyColumns: 60, scroll: { offset: 0, bodyRows: 8 } },
+    } as never)
+    expect((await ui.find({ type: 'Text', text: /^review 0$/ }))?.text).toBe('review 0')
+    expect(await ui.find({ type: 'Text', text: /rally in progress/ })).toBeTruthy()
+    await ui.unmount()
+  }
 })

@@ -3,7 +3,7 @@ import { expect, test } from 'claude-code/testing'
 import { finish, finishHost, isLive, openMatch, score, seat } from '../hooks/game'
 
 test('subagents replace the stand-ins and the match lives until the last one is done', async () => {
-  let m = seat(seat(openMatch('review'), 'a1', 'contract'), 'a2', 'break')
+  let m = seat(seat(openMatch('review', 'pane'), 'a1', 'contract'), 'a2', 'break')
   m = seat(m, 'a3', 'late')
   expect(m.players.map(one => one.label)).toEqual(['contract', 'break'])
 
@@ -16,7 +16,7 @@ test('subagents replace the stand-ins and the match lives until the last one is 
 })
 
 test('a command that starts no subagents ends with its turn', async () => {
-  const m = score(openMatch('review'), 'stand-in-1')
+  const m = score(openMatch('review', 'pane'), 'stand-in-1')
   expect(m.players[0]?.hits).toBe(1)
   expect(isLive(finishHost(m))).toBe(false)
 })

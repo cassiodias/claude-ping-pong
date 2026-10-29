@@ -1,0 +1,5 @@
+{
+  "name": "claude-ping-pong",
+  "owner": { "name": "Cassio Dias" },
+  "plugins": [{ "name": "puppet-ping-pong", "source": "./" }]
+}

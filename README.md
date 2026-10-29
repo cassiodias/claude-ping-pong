@@ -76,6 +76,17 @@ claude plugin install puppet-ping-pong --marketplace cassiodias/claude-ping-pong
 
 In the desktop app, where `/plugin` does not run: click + next to the prompt box, then Plugins, Add marketplace with `cassiodias/claude-ping-pong`, then Add plugin.
 
+## Update
+
+The `/plugin` menu has no update button. From a shell, fetch the new version from GitHub, then install it:
+
+```
+claude plugin marketplace update claude-ping-pong
+claude plugin update puppet-ping-pong@claude-ping-pong
+```
+
+Then restart Claude Code: open sessions keep the old version until they start again.
+
 ## Uninstall
 
 From a shell:

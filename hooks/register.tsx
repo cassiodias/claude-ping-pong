@@ -61,6 +61,11 @@ function fakeTestLine(n: number): string {
   return `PASSED tests/test_${SUITES[n % SUITES.length]}.py::test_${n} ${CHECKS[n % CHECKS.length]} (${(n * 37) % 90 + 3}ms)`
 }
 
+// A listed command starts when the person types it or Claude calls it through the Skill tool.
+async function begin($: EngineInterface, commands: Set<string>, name: string, display: Display) {
+  if (commands.has(name) && !isLive(await read($, match))) await start($, openMatch(name, display))
+}
+
 export const register: Register = (on, options) => {
   const commands = new Set(
     String(options.commands ?? '')
@@ -80,8 +85,8 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('skill.prompt', async ($, e, next) => {
-    if (commands.has(e.skill) && !isLive(await read($, match))) await start($, openMatch(e.skill, display))
+  on('prompt.submit', async ($, e, next) => {
+    if (e.command) await begin($, commands, e.command.name, display)
 
     return next(e)
   })
@@ -95,6 +100,11 @@ export const register: Register = (on, options) => {
   })
 
   on('tool.call', async ($, e, next) => {
+    if (e.tool === 'Skill') {
+      await begin($, commands, e.skill, display)
+
+      return next(e)
+    }
     await play($, m => score(m, e.agentId ?? m.players[tick % 2]?.id ?? ''))
 
     return next(e)

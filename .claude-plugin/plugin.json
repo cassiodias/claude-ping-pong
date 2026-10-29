@@ -1,6 +1,6 @@
 {
   "name": "puppet-ping-pong",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Two Claude puppets play ping pong in a pane while a slash command you pick runs, scoring its subagents' tool calls",
   "license": "MIT",
   "types": "./types/index.d.ts",

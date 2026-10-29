@@ -54,6 +54,13 @@ async function play($: EngineInterface, move: (m: Match) => Match) {
   $.clock.after(GAME_OVER_MS, () => clear($, after.display))
 }
 
+const SUITES = ['auth', 'orders', 'billing', 'search', 'webhooks', 'reports']
+const CHECKS = ['rejects an expired token', 'returns 404 for a missing id', 'paginates past the last page', 'retries once on a timeout']
+
+function fakeTestLine(n: number): string {
+  return `PASSED tests/test_${SUITES[n % SUITES.length]}.py::test_${n} ${CHECKS[n % CHECKS.length]} (${(n * 37) % 90 + 3}ms)`
+}
+
 export const register: Register = (on, options) => {
   const commands = new Set(
     String(options.commands ?? '')
@@ -110,10 +117,15 @@ export const register: Register = (on, options) => {
       rally,
       $.clock.after(12000, () => void play($, m => finish(m, 'demo-pong'))),
       $.clock.after(20000, () => {
-        rally.cancel()
+        demo.forEach(one => one.cancel())
         void play($, finishAll)
       }),
     ]
+    // `scroll` prints a fake test run into the transcript, to show the band staying put.
+    if (/scroll/i.test(e.args)) {
+      let line = 0
+      demo.push($.clock.every(250, () => $.ui.log(fakeTestLine(++line))))
+    }
 
     return { text: `Demo match started in the ping pong ${shown}.` }
   })
